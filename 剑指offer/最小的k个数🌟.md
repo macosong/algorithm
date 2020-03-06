@@ -4,39 +4,37 @@
 
 **1.基于快排**
 
-时间复杂度$O(n*log_2k)$
+时间复杂度$O(N)$
 
 ```java
-import java.util.*;
+import java.util.ArrayList;
 public class Solution {
     public ArrayList<Integer> GetLeastNumbers_Solution(int [] a, int k) {
         ArrayList<Integer> res = new ArrayList<>();
-        if(k == 0)    return res;
-        int low = 0, high = a.length - 1;
-        while(low <= high){
-            int p = a[low];
-            int i = low, j = high;
+        int n = a.length;
+        if(k > n)    return res;
+        int left = 0, right = n - 1;
+        while(left < right){
+            int p = a[left], i= left, j = right;
             while(i < j){
-                while(i < j && a[j] >= p)    j--;
-                while(i < j && a[i] <= p)    i++;
+                while(i < j && a[j] >= p)    --j;
+                while(i < j && a[i] <= p)    ++i;
                 if(i < j){
                     int tmp = a[i];
                     a[i] = a[j];
                     a[j] = tmp;
                 }
             }
-            a[low] = a[i];
+            a[left] = a[i];
             a[i] = p;
-            
-            if(i == k - 1){
-                for(int m = 0 ; m <= i; m++)    res.add(a[m]);
-                break;
-            }else if(i < k - 1){
-                low = i + 1;
+            if(i == k)    break;
+            else if(i < k){
+                left = i + 1;
             }else{
-                high = i - 1;
+                right = i - 1;
             }
         }
+        for(int i = 0 ; i < k ; ++i)    res.add(a[i]);
         return res;
     }
 }
@@ -51,16 +49,20 @@ public class Solution {
 ```java
 import java.util.*;
 public class Solution {
-    public ArrayList<Integer> GetLeastNumbers_Solution(int [] a, int k) {
+    public ArrayList<Integer> GetLeastNumbers_Solution(int[] a, int k) {
         ArrayList<Integer> res = new ArrayList<>();
-        if(k == 0 || k > a.length)    return res;
-        PriorityQueue<Integer> q =  new PriorityQueue<>((o1,o2) -> o2 - o1);
-        for (int cur : a){
-            q.offer(cur);
-            if (k-- > 0)    continue;
-            else    q.poll();
+        if(a == null || a.length == 0 || k > a.length || k == 0)    return res;
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(k, (o1, o2) -> (o2 - o1));
+        for(int i = 0 ; i < a.length ; ++i){
+            if(i < k)    maxHeap.offer(a[i]);
+            else{
+                if(a[i] < maxHeap.peek()){
+                    maxHeap.poll();
+                    maxHeap.offer(a[i]);
+                }
+            }
         }
-        while (!q.isEmpty())    res.add(q.poll());
+        for(int tmp : maxHeap)    res.add(tmp);
         return res;
     }
 }
